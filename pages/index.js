@@ -1,40 +1,8 @@
+import Head from "next/head";
+import { useRouter } from "next/router";
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
 import appConfig from "../config.json";
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: "Open Sans", sans-serif;
-      }
-      /* App fit Height */
-      html,
-      body,
-      #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */
-
-      h1 {
-        font-size: 1.6rem;
-      }
-    `}</style>
-  );
-}
+import React, { useState } from "react";
 
 function Titulo({ tag, children }) {
   const Tag = tag || "h1";
@@ -63,11 +31,14 @@ function Titulo({ tag, children }) {
 // export default HomePage;
 
 export default function PaginaInicial() {
-  const username = "EstherMarie";
+  const [username, setUsername] = useState("");
+  const roteamento = useRouter();
 
   return (
     <>
-      <GlobalStyle />
+      <Head>
+        <title>Aluracord - Login</title>
+      </Head>
       <Box
         styleSheet={{
           display: "flex",
@@ -103,6 +74,11 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={(infosDoEvento) => {
+              infosDoEvento.preventDefault();
+              console.log("Alguém submeteu o form");
+              roteamento.push("/chat");
+            }}
             styleSheet={{
               display: "flex",
               flexDirection: "column",
@@ -126,8 +102,11 @@ export default function PaginaInicial() {
 
             <TextField
               fullWidth
-              label="Senha"
-              placeholder="Senha"
+              label="Nome de Usuário do GitHub"
+              placeholder="Nome de Usuário"
+              onChange={(event) => {
+                setUsername(event.target.value);
+              }}
               textFieldColors={{
                 neutral: {
                   textColor: appConfig.theme.colors.neutrals[200],
@@ -172,7 +151,9 @@ export default function PaginaInicial() {
                 borderRadius: "50%",
                 marginBottom: "16px",
               }}
-              src={`https://github.com/${username}.png`}
+              src={`https://github.com/${
+                username.length >= 2 ? username : ""
+              }.png`}
             />
             <Text
               variant="body4"
