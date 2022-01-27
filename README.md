@@ -1,4 +1,5 @@
 # ImersaoReact_4
+
 > Aluracord - Windows XP
 
 Projeto realizado durante a 4ª edição da Imersão React da Alura.
@@ -10,6 +11,7 @@ Projeto realizado durante a 4ª edição da Imersão React da Alura.
 
 ## Tecnologias
 
+- TypeScript
 - React
 - Next.js
 - [SkynexUI](https://skynexui.dev/)
