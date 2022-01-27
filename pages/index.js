@@ -103,7 +103,6 @@ export default function PaginaInicial() {
             <TextField
               fullWidth
               label="Nome de Usuário do GitHub"
-              placeholder="Nome de Usuário"
               onChange={(event) => {
                 setUsername(event.target.value);
               }}
@@ -152,7 +151,7 @@ export default function PaginaInicial() {
                 marginBottom: "16px",
               }}
               src={`https://github.com/${
-                username.length >= 2 ? username : ""
+                username.length >= 2 ? username : "clippy"
               }.png`}
             />
             <Text
