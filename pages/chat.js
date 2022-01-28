@@ -1,19 +1,51 @@
 import Head from "next/head";
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMyMTQ2NywiZXhwIjoxOTU4ODk3NDY3fQ.U2_yiepAQzSGaACwjEr0oAwyBSdLCbu-u7rXTbIwSQY";
+const SUPABASE_URL = "https://ozgnwigeodhojorfjhnp.supabase.co";
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
   // Sua lógica vai aqui
   const [mensagem, setMensagem] = useState("");
   const [listaDeMensagens, setListaDeMensagens] = useState([]);
 
+  // UseEffect() -> usado para lidar com todas as coisas que fogem do fluxo padrão do componente
+  // - Fluxo padrão -> execução. São todos os valores dentro do return que são executados e exibidos
+  // - Dados fora do fluxo padrão -> é quando o dado vem de um servidor externo ou quando precisa de um tempo para aparecer
+
+  // Por padrão o useEffect roda sempre que a página carraga
+
+  useEffect(() => {
+    supabaseClient
+      .from("mensagens")
+      .select("*")
+      .order("id", { ascending: false })
+      .then(({ data, error }) => {
+        setListaDeMensagens(data);
+        console.log("Dados da consulta: ", data);
+      });
+  }, []); //se a mensagem mudar, observe as mudanças e rode novamente
+
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
       usuario: "EstherMarie",
       texto: novaMensagem,
     };
-    setListaDeMensagens([mensagem, ...listaDeMensagens]);
+
+    supabaseClient
+      .from("mensagens")
+      .insert([mensagem])
+      .then(({ data }) => {
+        setListaDeMensagens([data[0], ...listaDeMensagens]);
+        console.log("Criando mensagem: ", data);
+      });
+
     setMensagem("");
   }
   // ./Sua lógica vai aqui
