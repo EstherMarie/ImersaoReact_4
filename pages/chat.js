@@ -2,13 +2,7 @@ import Head from "next/head";
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMyMTQ2NywiZXhwIjoxOTU4ODk3NDY3fQ.U2_yiepAQzSGaACwjEr0oAwyBSdLCbu-u7rXTbIwSQY";
-const SUPABASE_URL = "https://ozgnwigeodhojorfjhnp.supabase.co";
-
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabaseClient } from "../client";
 
 export default function ChatPage() {
   // Sua lógica vai aqui
