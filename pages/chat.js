@@ -2,12 +2,31 @@ import Head from "next/head";
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
+import { useRouter } from "next/router";
 import { supabaseClient } from "../client";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
+
+function escutaMensagensEmTempoReal(adicionaMensagem) {
+  return supabaseClient
+    .from("mensagens")
+    .on("INSERT", (respostaLive) => {
+      adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
 
 export default function ChatPage() {
-  // Sua lógica vai aqui
+  const roteamento = useRouter();
+  const usuarioLogado = roteamento.query.username;
+  console.log(usuarioLogado);
   const [mensagem, setMensagem] = useState("");
-  const [listaDeMensagens, setListaDeMensagens] = useState([]);
+  const [listaDeMensagens, setListaDeMensagens] = useState([
+    // {
+    //   usuario: "esthermarie",
+    //   texto:
+    //     ":sticker: http://2.bp.blogspot.com/-d21tffsTIQo/U_H9QjC69gI/AAAAAAAAKqM/wnvOyUr6a_I/s1600/Pikachu%2B2.gif",
+    // },
+  ]);
 
   // UseEffect() -> usado para lidar com todas as coisas que fogem do fluxo padrão do componente
   // - Fluxo padrão -> execução. São todos os valores dentro do return que são executados e exibidos
@@ -24,11 +43,21 @@ export default function ChatPage() {
         setListaDeMensagens(data);
         console.log("Dados da consulta: ", data);
       });
+
+    escutaMensagensEmTempoReal((novaMensagem) => {
+      // Quero reusar um valor de referencia (objeto/array)
+      // Passar uma função pro setState
+
+      setListaDeMensagens((valorAtualDaLista) => {
+        console.log("valorAtualDaLista:", valorAtualDaLista);
+        return [novaMensagem, ...valorAtualDaLista];
+      });
+    });
   }, []); //se a mensagem mudar, observe as mudanças e rode novamente
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      usuario: "EstherMarie",
+      usuario: usuarioLogado,
       texto: novaMensagem,
     };
 
@@ -36,13 +65,13 @@ export default function ChatPage() {
       .from("mensagens")
       .insert([mensagem])
       .then(({ data }) => {
-        setListaDeMensagens([data[0], ...listaDeMensagens]);
+        // setListaDeMensagens([data[0], ...listaDeMensagens]);
         console.log("Criando mensagem: ", data);
       });
 
     setMensagem("");
   }
-  // ./Sua lógica vai aqui
+
   return (
     <>
       <Head>
@@ -130,6 +159,12 @@ export default function ChatPage() {
                   color: appConfig.theme.colors.neutrals[200],
                 }}
               />
+              <ButtonSendSticker
+                onStickerClick={(sticker) => {
+                  // console.log('[USANDO O COMPONENTE] Salva esse sticker no banco', sticker);
+                  handleNovaMensagem(`:sticker: ${sticker}`);
+                }}
+              />
             </Box>
           </Box>
         </Box>
@@ -171,7 +206,7 @@ function MessageList({ mensagens }) {
     <Box
       tag="ul"
       styleSheet={{
-        // overflow: "scroll",
+        overflowY: "scroll",
         display: "flex",
         flexDirection: "column-reverse",
         flex: 1,
@@ -210,7 +245,7 @@ function MessageList({ mensagens }) {
                   !mensagem.usuario ? vanessametonini : mensagem.usuario
                 }.png`}
               />
-              <Text tag="strong">{mensagem.de}</Text>
+              <Text tag="strong">{mensagem.usuario}</Text>
               <Text
                 styleSheet={{
                   fontSize: "10px",
@@ -222,7 +257,15 @@ function MessageList({ mensagens }) {
                 {new Date().toLocaleDateString()}
               </Text>
             </Box>
-            {mensagem.texto}
+            {mensagem.texto.startsWith(":sticker:") ? (
+              <Image
+                src={mensagem.texto.replace(":sticker:", "")}
+                styleSheet={{ maxWidth: "30%" }}
+              />
+            ) : (
+              mensagem.texto
+            )}
+            {/* {mensagem.texto} */}
           </Text>
         );
       })}
